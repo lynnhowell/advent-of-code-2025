@@ -1,7 +1,7 @@
 from pathlib import Path
 
 SCRIPT_PATH = Path(__file__).resolve().parent
-INPUT_PATH = Path(SCRIPT_PATH, "inputs/input.txt")
+INPUT_PATH = Path(SCRIPT_PATH, "input.txt")
 # INPUT_PATH = Path(SCRIPT_PATH, "inputs/example1.txt")
 # INPUT_PATH = Path(SCRIPT_PATH, "inputs/example2.txt")
 
