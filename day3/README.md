@@ -15,11 +15,9 @@ This repository contains the solution for **Day 3** of Advent of Code 2025, impl
 
 ## Usage
 
-1. **Install Python 3.7+** (and recommended: create a virtual environment).
-
 2. **Prepare your input file.**
 
-   Place your input as `input.txt` within the `day3/` directory, or use one of the example files by un-commenting in the script.
+   Place your input as `input.txt` within the `Day3/` directory, or use one of the example files by un-commenting in the script.
 
 3. **Run the Script:**
 
