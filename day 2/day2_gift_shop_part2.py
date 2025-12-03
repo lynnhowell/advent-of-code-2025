@@ -77,6 +77,7 @@ def generate_invalid_numbers(global_min, global_max):
 
                 invalid.add(N)
 
+    
     return invalid
 
 
