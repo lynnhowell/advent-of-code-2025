@@ -1,3 +1,10 @@
+from pathlib import Path
+
+SCRIPT_PATH = Path(__file__).resolve().parent
+INPUT_PATH = Path(SCRIPT_PATH, "input.txt")
+# INPUT_PATH = Path(SCRIPT_PATH, "inputs/example1.txt")
+# INPUT_PATH = Path(SCRIPT_PATH, "inputs/example2.txt")
+
 def parse_input(data):
     # Function for parsing input.
     data_list = [list(num) for num in data.splitlines()]
