@@ -4,7 +4,7 @@ import numpy as np
 Part 1
 """
 
-input_path = "inputs/07.txt"
+input_path = "input7.txt"
 # input_path = "inputs/07_example.txt"
 
 with open(input_path) as file:
