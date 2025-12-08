@@ -32,4 +32,5 @@ for i, (b1, b2, distance) in enumerate(sorted(distances, key=lambda x: x[2])):
         print(f"Part 1: {len(circuits[0]) * len(circuits[1]) * len(circuits[2])}")
 
     if not box_index:
-        print(f"P
+        print(f"Part 2: {boxes[b1][0] * boxes[b2][0]}")
+        break
