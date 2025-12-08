@@ -1,36 +1,48 @@
-with open("input8.txt", "r") as puzzleInput:
-    boxes = [[int(n) for n in line.strip().split(",")] for line in puzzleInput.readlines()]
+import networkx as nx
+from collections import namedtuple
+from math import sqrt
 
-distances, circuits, merged_index, box_index, p1_limit = [], [], set(), set(range(0, len(boxes))), 1000
+Point = namedtuple('Point', ['x', 'y','z'])
+raw_input = []
+f = open('input8.txt','rt')
+for line in f:
+    raw_input += [line.strip()]
+f.close()
 
-for b1, (x1, y1, z1) in enumerate(boxes):
-    for b2, (x2, y2, z2) in enumerate(boxes):
-        if b2 <= b1:
-            continue
-        distances.append((b1, b2, (x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2))
+def distance(pair):
+    p1, p2 = pair
+    distance = sqrt((p2.x - p1.x)**2 + (p2.y-p1.y)**2 + (p2.z-p1.z)**2)
+    return distance
 
-for i, (b1, b2, distance) in enumerate(sorted(distances, key=lambda x: x[2])):
-    connection = {b1, b2}
-    for c, circuit in enumerate(circuits):
-        if connection & circuit:
-            circuits[c].update(connection)
-            # check to see if any circuits can be merged
-            if i <= p1_limit - 1 and connection <= merged_index:
-                for cc, circuit_check in enumerate(circuits):
-                    if c != cc and connection & circuit_check:
-                        circuits[c].update(circuit_check)
-                        circuits.pop(cc)
-                        break
-            break
-    else:
-        circuits.append(connection)
-    merged_index.update(connection)
-    box_index -= connection
-    
-    if i == p1_limit - 1:
-        circuits.sort(key=len, reverse=True)
-        print(f"Part 1: {len(circuits[0]) * len(circuits[1]) * len(circuits[2])}")
+G = nx.Graph()
 
-    if not box_index:
-        print(f"Part 2: {boxes[b1][0] * boxes[b2][0]}")
+point_pairs = []
+points = []
+for line in raw_input:
+    x,y,z = [int(x) for x in line.split(',')]
+    points += [Point(x,y,z)]
+for i, p1 in enumerate(points):
+    for p2 in points[i+1:]:
+        point_pairs += [(p1, p2)]
+point_pairs.sort(key=lambda pair:distance(pair))
+
+for pair in point_pairs[:1000]:
+    G.add_edge(pair[0], pair[1])
+circuits = list(nx.connected_components(G))
+circuits.sort(key=lambda x:len(x))
+circuit_lengths = []
+for item in circuits[::-1]:
+    circuit_lengths += [len(item)]
+part1 = circuit_lengths[0] * circuit_lengths[1] * circuit_lengths[2]
+print('Part 1: ' + str(part1))
+
+
+final_pair = None
+for pair in point_pairs[1000:]:
+    G.add_edge(pair[0], pair[1])
+    if nx.is_connected(G) == True and all(G.has_node(node) for node in points) == True:
+        final_pair = pair
         break
+if final_pair != None:
+    part2 = final_pair[0].x * final_pair[1].x
+print('Part 2: ' + str(part2))
