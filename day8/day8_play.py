@@ -1,24 +1,75 @@
-import sys
-import math
-from itertools import combinations
+JunctionList = []
+with open("input8.txt", "r") as data:
+    for t in data:
+        Line = t.strip()
+        A,B,C = Line.split(",")
+        JunctionList.append((int(A), int(B), int(C)))
 
-boxes = [tuple(map(int, line.split(','))) for line in sys.stdin]
-P1 = 10 if len(boxes) < 50 else 1000
+JunctionInDict = {}
+AdjacenciesList = []
+NumJunctions = len(JunctionList)
+for va in range(NumJunctions):
+    JunctionInDict[va] = None
+    AX, AY, AZ = JunctionList[va]
+    for vb in range(va+1, NumJunctions):
+        BX, BY, BZ = JunctionList[vb]
+        Distance = (AX-BX)**2 + (AY-BY)**2 + (AZ-BZ)**2
+        AdjacenciesList.append((Distance, va, vb))
 
-groups = {frozenset([b]) for b in boxes}
-ds = sorted(combinations(boxes, 2), key=lambda p: math.dist(*p))
+def Part1Parse():
+    CircuitSizes = []
+    for y in CircuitDict:
+        Size = len(CircuitDict[y])
+        CircuitSizes.append(Size)
+    CircuitSizes.sort()
+    CircuitSizes.reverse()
+    Answer = CircuitSizes[0]*CircuitSizes[1]*CircuitSizes[2]
+    return Answer
 
-p1 = 0
-for i, (p,q) in enumerate(ds):
-    p2 = p[0]*q[0]
-    g1, g2 = [next(g for g in groups if x in g) for x in (p, q)]
-    groups -= {g1, g2}
-    groups.add(g1 | g2)
 
-    if i+1 == P1:
-        p1 = math.prod(sorted(map(len, groups), reverse=True)[:3])
-
-    if len(groups) == 1:
+AdjacenciesList.sort()
+CircuitDict = {}
+CurrentCircuit = 1
+for t in range(len(AdjacenciesList)):
+    _, A, B = AdjacenciesList[t]
+    CA = JunctionInDict[A]
+    CB = JunctionInDict[B]
+    if CA == CB == None:
+        CircuitDict[CurrentCircuit] = set()
+        CircuitDict[CurrentCircuit].add(A)
+        CircuitDict[CurrentCircuit].add(B)
+        JunctionInDict[A] = CurrentCircuit
+        JunctionInDict[B] = CurrentCircuit
+        CurrentCircuit += 1
+    elif CA == CB:
+        continue
+    elif CA == None:
+        CircuitDict[CB].add(A)
+        JunctionInDict[A] = CB
+    elif CB == None:
+        CircuitDict[CA].add(B)
+        JunctionInDict[B] = CA
+    else:
+        CircuitDict[CA] = CircuitDict[CA] | CircuitDict[CB]
+        del CircuitDict[CB]
+        for j in CircuitDict[CA]:
+            JunctionInDict[j] = CA
+    
+    if t == 999:
+        Part1Answer = Part1Parse()
+    Stop = False
+    for u in [CA, CB]:
+        if u not in CircuitDict:
+            continue
+        if len(CircuitDict[u]) == NumJunctions:
+            AX = JunctionList[A][0]
+            AB = JunctionList[B][0]
+            Part2Answer = AX*AB
+            Stop = True
+            break
+    if Stop:
         break
 
-print(p1, p2)
+
+print(f"{Part1Answer = }")
+print(f"{Part2Answer = }")
