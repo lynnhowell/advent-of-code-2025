@@ -1,48 +1,24 @@
-import networkx as nx
-from collections import namedtuple
-from math import sqrt
+import sys
+import math
+from itertools import combinations
 
-Point = namedtuple('Point', ['x', 'y','z'])
-raw_input = []
-f = open('input8.txt','rt')
-for line in f:
-    raw_input += [line.strip()]
-f.close()
+boxes = [tuple(map(int, line.split(','))) for line in sys.stdin]
+P1 = 10 if len(boxes) < 50 else 1000
 
-def distance(pair):
-    p1, p2 = pair
-    distance = sqrt((p2.x - p1.x)**2 + (p2.y-p1.y)**2 + (p2.z-p1.z)**2)
-    return distance
+groups = {frozenset([b]) for b in boxes}
+ds = sorted(combinations(boxes, 2), key=lambda p: math.dist(*p))
 
-G = nx.Graph()
+p1 = 0
+for i, (p,q) in enumerate(ds):
+    p2 = p[0]*q[0]
+    g1, g2 = [next(g for g in groups if x in g) for x in (p, q)]
+    groups -= {g1, g2}
+    groups.add(g1 | g2)
 
-point_pairs = []
-points = []
-for line in raw_input:
-    x,y,z = [int(x) for x in line.split(',')]
-    points += [Point(x,y,z)]
-for i, p1 in enumerate(points):
-    for p2 in points[i+1:]:
-        point_pairs += [(p1, p2)]
-point_pairs.sort(key=lambda pair:distance(pair))
+    if i+1 == P1:
+        p1 = math.prod(sorted(map(len, groups), reverse=True)[:3])
 
-for pair in point_pairs[:1000]:
-    G.add_edge(pair[0], pair[1])
-circuits = list(nx.connected_components(G))
-circuits.sort(key=lambda x:len(x))
-circuit_lengths = []
-for item in circuits[::-1]:
-    circuit_lengths += [len(item)]
-part1 = circuit_lengths[0] * circuit_lengths[1] * circuit_lengths[2]
-print('Part 1: ' + str(part1))
-
-
-final_pair = None
-for pair in point_pairs[1000:]:
-    G.add_edge(pair[0], pair[1])
-    if nx.is_connected(G) == True and all(G.has_node(node) for node in points) == True:
-        final_pair = pair
+    if len(groups) == 1:
         break
-if final_pair != None:
-    part2 = final_pair[0].x * final_pair[1].x
-print('Part 2: ' + str(part2))
+
+print(p1, p2)
